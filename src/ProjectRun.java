@@ -14,7 +14,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         this.addKeyListener(this);
         this.setPreferredSize(new Dimension(width, height));
         pista = new Pista();
-        player = new Player(250,300, 32, 32);
+        player = new Player(width/2,400, 32, 32);
     }
     public static void main(String[] args) {
         ProjectRun projectRun = new ProjectRun();
