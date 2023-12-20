@@ -1,12 +1,9 @@
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 
-import javax.swing.Timer;
 
 public class Player {
-    Timer timer = new Timer(10000, null);
-    AffineTransform t = new AffineTransform();
-    int x,y, width, height;
+    
+    int x,y, width, height, vida = 5;
     public boolean right, left, acelerar, freiar;
     public Player(int x, int y,int width,int height) {
        this.x = x;
@@ -47,7 +44,7 @@ public class Player {
     }
 
     public void render(Graphics g){
-        g.setColor(Color.GREEN);
+        g.setColor(Color.BLUE);
         g.fill3DRect(x,y,width,height,true);
     }
 
