@@ -19,19 +19,28 @@ public class Player {
 
     public void tick(){
         if(right){
-            x+= 4;
+            if(x < 500 - width){
+                x+= 4;
+            }
+          
         }
         if(left){
-            x-= 4;
+           if(x > 0){
+               x-= 4;
+           }
         }
         if(acelerar){
             
-        y-= 2;
+            if(y > 0){
+                y-= 4;
+            }
 
             
         }
         if(freiar){
-            y+= 2;
+            if(y < 500 - height){
+                y+= 4;
+            }
         }
 
 

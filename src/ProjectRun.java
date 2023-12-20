@@ -7,11 +7,13 @@ import java.awt.image.BufferStrategy;
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class ProjectRun extends Canvas implements Runnable, KeyListener {
+    public Pista pista;
     public Player player;
     public static int width = 500, height = 500;
     public ProjectRun(){
         this.addKeyListener(this);
         this.setPreferredSize(new Dimension(width, height));
+        pista = new Pista();
         player = new Player(250,300, 32, 32);
     }
     public static void main(String[] args) {
@@ -37,6 +39,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0,0,width,height);
+        pista.render(g);
         player.render(g);
         bs.show();
 
