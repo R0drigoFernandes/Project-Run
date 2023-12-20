@@ -12,7 +12,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     public ProjectRun(){
         this.addKeyListener(this);
         this.setPreferredSize(new Dimension(width, height));
-        player = new Player(250,300);
+        player = new Player(250,300, 32, 32);
     }
     public static void main(String[] args) {
         ProjectRun projectRun = new ProjectRun();
