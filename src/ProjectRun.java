@@ -1,0 +1,100 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferStrategy;
+
+// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
+// then press Enter. You can now see whitespace characters in your code.
+public class ProjectRun extends Canvas implements Runnable, KeyListener {
+    public Player player;
+    public static int width = 500, height = 500;
+    public ProjectRun(){
+        this.addKeyListener(this);
+        this.setPreferredSize(new Dimension(width, height));
+        player = new Player(250,300);
+    }
+    public static void main(String[] args) {
+        ProjectRun projectRun = new ProjectRun();
+        JFrame frame = new JFrame();
+        frame.add(projectRun);
+        frame.setTitle("Project Run");
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        new Thread(projectRun).start();
+    }
+    public void tick(){
+    player.tick();
+    }
+    public void render(){
+        BufferStrategy bs = this.getBufferStrategy();
+        if(bs == null){
+            this.createBufferStrategy(3);
+            return;
+        }
+        Graphics g = bs.getDrawGraphics();
+        g.setColor(Color.WHITE);
+        g.fillRect(0,0,width,height);
+        player.render(g);
+        bs.show();
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if(keyCode == KeyEvent.VK_RIGHT){
+            player.right = true;
+
+        }
+        if(keyCode == KeyEvent.VK_LEFT){
+            player.left = true;
+        }
+        if(keyCode == KeyEvent.VK_UP){
+            player.acelerar = true;
+        }
+        if (keyCode == KeyEvent.VK_DOWN){
+            player.freiar = true;
+        }
+
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if(keyCode == KeyEvent.VK_RIGHT){
+            player.right = false;
+
+        }
+        if(keyCode == KeyEvent.VK_LEFT){
+            player.left = false;
+        }
+        if(keyCode == KeyEvent.VK_UP){
+            player.acelerar = false;
+        }
+        if (keyCode == KeyEvent.VK_DOWN){
+            player.freiar = false;
+        }
+    }
+
+    @Override
+    public void run() {
+    while (true){
+        tick();
+        render();
+        try {
+            Thread.sleep(1000/60);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    }
+}
