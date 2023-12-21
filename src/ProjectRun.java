@@ -17,7 +17,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         this.setPreferredSize(new Dimension(width, height));
         pista = new Pista();
         
-            carros = new Carros(width/2,0, 32, 32); 
+         carros = new Carros(); 
          
            
         
@@ -49,7 +49,9 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.WHITE);
         g.fillRect(0,0,width,height);
         pista.render(g);
+        
         carros.render(g);
+        
         
         player.render(g);
         bs.show();
