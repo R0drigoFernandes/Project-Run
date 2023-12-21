@@ -1,9 +1,9 @@
 import java.awt.*;
 
 
-public class Player {
+public class Player extends Rectangle{
     
-    int x,y, width, height, vida = 5;
+    public int x,y, width, height, vida = 5, spd = 4;
     public boolean right, left, acelerar, freiar;
     public Player(int x, int y,int width,int height) {
        this.x = x;
@@ -17,26 +17,26 @@ public class Player {
     public void tick(){
         if(right){
             if(x < 500 - width){
-                x+= 4;
+                x+= spd;
             }
           
         }
         if(left){
            if(x > 0){
-               x-= 4;
+               x-= spd;
            }
         }
         if(acelerar){
             
             if(y > 0){
-                y-= 4;
+                y-= spd;
             }
 
             
         }
         if(freiar){
             if(y < 500 - height){
-                y+= 4;
+                y+= spd;
             }
         }
 
