@@ -3,30 +3,48 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 public class Carros {
     int x = 200, y = 0, width = 32, height = 32;
+    public int acelerar = 2, pontos = 0;
+    public boolean remove;
     public ArrayList<Carros> carros = new ArrayList<>();
     
     
         
     public Carros(){  
+        
             carros.add(this);
        
     }
+    public boolean verificaColisao(Player player){
+        if( this.x < player.x + player.width &&
+               this.x + this.width > player.x &&
+               this.y < player.y + player.height &&
+               this.y + this.height > player.y){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public void tick(){
-        y+=10;
+        y += acelerar;
         
-        if(y > 500){
-          carros.remove(this);
+        if(y > 500 || remove){
           y = 0;
+          carros.remove(this);
           carros.add(new Carros());
           x = (int)(Math.random()*(310 - 170 + 1) + 170);
+          pontos++;
+          if(acelerar < 15){
+              acelerar++;
+          }
+          
         }
     }
     public void render( Graphics g){
-        if(y < 500){
+        
             g.setColor(Color.RED);
             g.fillRect(x, y, width, height);
-        }
+        
        
     }
     

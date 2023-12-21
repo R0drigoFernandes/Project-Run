@@ -1,20 +1,44 @@
 import java.awt.*;
 
 
-public class Player extends Rectangle{
-    
+
+
+public class Player extends Rectangle {
+   
+    public Carros carros ;
     public int x,y, width, height, vida = 5, spd = 4;
     public boolean right, left, acelerar, freiar;
-    public Player(int x, int y,int width,int height) {
+    
+    public Player(int x, int y,int width,int height,Carros carros){
        this.x = x;
        this.y = y;
        this.width = width;
        this.height = height;
+       this.carros = carros;
+       
+    
 
 
     }
+    public void perderVida(){
+       
+            vida--;
+        
+        
+        if(vida == 0){
+            System.exit(0);
+        }
+    }
 
     public void tick(){
+       
+        boolean colisao = carros.verificaColisao(this);
+        if(colisao){
+            perderVida();
+            carros.remove = true;
+        }else{
+            carros.remove = false;
+        }
         if(right){
             if(x < 315){
                 x+= spd;
@@ -44,6 +68,10 @@ public class Player extends Rectangle{
     }
 
     public void render(Graphics g){
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.setColor(Color.WHITE);
+        g.drawString("Vida: " + vida, 10, 20);
+        g.drawString("Pontos: " + carros.pontos, 10, 40);
         g.setColor(Color.BLUE);
         g.fill3DRect(x,y,width,height,true);
     }

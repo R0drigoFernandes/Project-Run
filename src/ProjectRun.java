@@ -17,7 +17,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         this.setPreferredSize(new Dimension(width, height));
         pista = new Pista();
         carros = new Carros(); 
-        player = new Player(width/2,400, 32, 32);
+        player = new Player(width/2,400, 32, 32, carros);
     }
     public static void main(String[] args) {
         ProjectRun projectRun = new ProjectRun();
@@ -28,6 +28,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        
         new Thread(projectRun).start();
     }
     public void tick(){
