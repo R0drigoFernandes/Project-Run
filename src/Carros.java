@@ -1,8 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
-public class Carros {
+public class Carros extends ProjectRun {
     int x, y, width, height;
-
+    public int car = 0;
     public Carros(int x, int y, int width, int height){
         this.x = x;
         this.y = y;
@@ -14,8 +14,14 @@ public class Carros {
         y+=2;
     }
     public void render( Graphics g){
-        g.setColor(Color.RED);
-        g.fillRect(x, y, width, height);
+        if(y < 500){
+            g.setColor(Color.BLUE);
+            g.fillRect(x, y, width, height);
+        }else if(y == 500){
+            g.clearRect(x, y, width, height);
+            
+        }
+       
     }
     
 }
