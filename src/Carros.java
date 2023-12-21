@@ -1,9 +1,9 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
-public class Carros {
+public class Carros{
     int x = 200, y = 0, width = 32, height = 32;
-    public int acelerar = 2, pontos = 0;
+    public int acelerar = 2, pontos = 0, contador = 0;
     public boolean remove;
     public ArrayList<Carros> carros = new ArrayList<>();
     
@@ -29,6 +29,7 @@ public class Carros {
         y += acelerar;
         
         if(y > 500 || remove){
+          contador++;  
           y = 0;
           carros.remove(this);
           carros.add(new Carros());
@@ -40,6 +41,7 @@ public class Carros {
           
         }
     }
+   
     public void render( Graphics g){
         
             g.setColor(Color.RED);

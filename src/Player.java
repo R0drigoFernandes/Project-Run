@@ -6,15 +6,17 @@ import java.awt.*;
 public class Player extends Rectangle {
    
     public Carros carros ;
+    public Consertar consertar;
     public int x,y, width, height, vida = 5, spd = 4;
     public boolean right, left, acelerar, freiar;
     
-    public Player(int x, int y,int width,int height,Carros carros){
+    public Player(int x, int y,int width,int height,Carros carros,Consertar consertar) {
        this.x = x;
        this.y = y;
        this.width = width;
        this.height = height;
        this.carros = carros;
+       this.consertar = consertar;
        
     
 
@@ -31,8 +33,14 @@ public class Player extends Rectangle {
     }
 
     public void tick(){
-       
+       boolean pegar = consertar.verificaColisao(this);
         boolean colisao = carros.verificaColisao(this);
+        if(pegar){
+            vida++;
+            consertar.remove = true;
+        }else{
+            consertar.remove = false;
+        }
         if(colisao){
             perderVida();
             carros.remove = true;
