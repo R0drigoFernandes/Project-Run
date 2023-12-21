@@ -11,7 +11,7 @@ public class Carros {
     }
 
     public void tick(){
-        y++;
+        y+=2;
     }
     public void render( Graphics g){
         g.setColor(Color.RED);
