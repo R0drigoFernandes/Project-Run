@@ -12,8 +12,11 @@ public class Consertar extends Carros {
 
     
     public Consertar(){  
+      
+          consertar.add(this);
+          
+      
        
-            consertar.add(this);
             
         
     
@@ -30,23 +33,22 @@ public class Consertar extends Carros {
     }
 
     public void tick(){
-       y++;
-       
+       y+= 2;
+      
        if(y > 500 || remove){
-           y = 0;
+        
+          y = 0;
+          
            consertar.remove(this);
+           consertar.add(new Consertar());      
+           x = (int)(Math.random()*(310 - 150 + 1) + 150); 
            
-              if(contador == 100){
-                  consertar.add(new Consertar());
-                  contador = 0;
-              }
-           
-           
-           
-           x = (int)(Math.random()*(310 - 150 + 1) + 150);  
+            
 
-       }
+       
     }
+}
+    
     public void render( Graphics g){
         
             g.setColor(Color.cyan);

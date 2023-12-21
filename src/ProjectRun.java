@@ -34,7 +34,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     }
     public void tick(){
     player.tick();
-    carros.tick();
+    carros.tick(); 
     consertar.tick();
     }
     public void render(){
