@@ -32,7 +32,7 @@ public class Carros {
           y = 0;
           carros.remove(this);
           carros.add(new Carros());
-          x = (int)(Math.random()*(310 - 160 + 1) + 160);
+          x = (int)(Math.random()*(310 - 150 + 1) + 150);
           pontos++;
           if(acelerar < 15){
               acelerar++;
