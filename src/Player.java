@@ -3,7 +3,7 @@ import java.awt.*;
 
 
 
-public class Player extends Rectangle {
+public class Player extends Rectangle{
    
     public Carros carros ;
     public Consertar consertar;
@@ -27,9 +27,7 @@ public class Player extends Rectangle {
             vida--;
         
         
-        if(vida == 0){
-            System.exit(0);
-        }
+       
     }
 
     public void tick(){

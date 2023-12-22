@@ -28,16 +28,25 @@ public class Carros{
     public void tick(){
         
         y += acelerar;
-        
-        if(y > 500 || remove){
+        if(remove){
             y = 0;
             carros.remove(this);
             carros.add(new Carros());
             x = (int)(Math.random()*(310 - 150 + 1) + 150);
-            contador++;  
-          pontos++;
-          if(contador == 10){
-            if(acelerar <= 15){
+        }
+        if(y > 500){
+            y = 0;
+            carros.remove(this);
+            carros.add(new Carros());
+            x = (int)(Math.random()*(310 - 150 + 1) + 150);
+           
+              pontos++;
+            contador++;
+            
+
+            if(contador == 6){
+              
+            if(acelerar <= 20){
               acelerar++;
               contador = 0;
             }

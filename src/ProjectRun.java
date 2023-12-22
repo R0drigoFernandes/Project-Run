@@ -7,17 +7,22 @@ import java.awt.image.BufferStrategy;
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class ProjectRun extends Canvas implements Runnable, KeyListener {
+    
     public Pista pista;
     public Player player;
     public Carros carros;
     public Consertar consertar;
     public static int width = 500, height = 500;
+    private boolean isRunning = true;
+    
+    
     public ProjectRun(){
         this.addKeyListener(this);
         this.setPreferredSize(new Dimension(width, height));
         pista = new Pista();
         carros = new Carros(); 
         consertar = new Consertar();
+       
         player = new Player(width/2,400, 32, 32, carros, consertar);
     }
     public static void main(String[] args) {
@@ -29,13 +34,18 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        
         new Thread(projectRun).start();
+        
+    
     }
     public void tick(){
     player.tick();
     carros.tick(); 
     consertar.tick();
+    
+   
+    
+    
     }
     public void render(){
         BufferStrategy bs = this.getBufferStrategy();
@@ -99,7 +109,11 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
 
     @Override
     public void run() {
-    while (true){
+        if(player.vida == 0){
+            isRunning = false;
+        }   
+        while (true){
+            while(isRunning){ 
         tick();
         render();
         try {
@@ -109,4 +123,6 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         }
     }
     }
+}
+
 }
