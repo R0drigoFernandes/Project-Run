@@ -13,7 +13,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     public Carros carros;
     public Consertar consertar;
     public static int width = 500, height = 500;
-    private boolean isRunning = true;
+    private boolean running =true;
     
     
     public ProjectRun(){
@@ -60,6 +60,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         carros.render(g);
         consertar.render(g);
         player.render(g);
+       
         bs.show();
 
     }
@@ -109,20 +110,23 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
 
     @Override
     public void run() {
-        if(player.vida == 0){
-            isRunning = false;
-        }   
-        while (true){
-            while(isRunning){ 
-        tick();
-        render();
-        try {
-            Thread.sleep(1000/60);
-        }catch (Exception e){
-            e.printStackTrace();
+        while(running){
+            tick();
+            render();
+            try {
+                Thread.sleep(1000/60);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
+      
     }
+
+    public void GameOver(){
+        JOptionPane.showMessageDialog(null, "Jogo finalizado");
+        running = false;
+        System.exit(0);
+
     }
 }
 
-}

@@ -3,7 +3,7 @@ import java.awt.*;
 
 
 
-public class Player extends Rectangle{
+public class Player{
    
     public Carros carros ;
     public Consertar consertar;
@@ -25,7 +25,11 @@ public class Player extends Rectangle{
     public void perderVida(){
        
             vida--;
-        
+        if (vida == 0){
+            ProjectRun game = new ProjectRun();
+            game.GameOver();
+            
+        }
         
        
     }
