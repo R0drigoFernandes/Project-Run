@@ -5,7 +5,7 @@ import java.awt.Color;
    
 
 public class Consertar {
-   int x = 200, y = 0, width = 32, height = 32;
+   int x = 200, y = 0, width = 16, height = 16;
     public boolean remove;
     public ArrayList<Consertar> consertar = new ArrayList<>();
     public int spd = 2;
@@ -47,7 +47,7 @@ public class Consertar {
     public void render( Graphics g){
         
             g.setColor(Color.cyan);
-            g.fillRect(x, y, width, height);
+            g.fillOval(x, y, width, height);
         
        
     }
