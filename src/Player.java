@@ -7,12 +7,13 @@ public class Player{
    
     public Carros carros ;
     public Consertar consertar;
-    public int x,y, width, height, vida = 5, spd = 4;
+    public int x,y, width, height, vida , spd = 4;
     public boolean right, left, acelerar, freiar;
     
-    public Player(int x, int y,int width,int height,Carros carros,Consertar consertar) {
+    public Player(int x, int y, int vida,int width,int height,Carros carros,Consertar consertar) {
        this.x = x;
        this.y = y;
+       this.vida = vida;
        this.width = width;
        this.height = height;
        this.carros = carros;
@@ -25,9 +26,10 @@ public class Player{
     public void perderVida(){
        
             vida--;
-        if (vida == 0){
+        if (vida <= 0){
             ProjectRun game = new ProjectRun();
             game.GameOver();
+            game.gamereset();
             
         }
         

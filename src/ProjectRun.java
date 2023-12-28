@@ -7,13 +7,13 @@ import java.awt.image.BufferStrategy;
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class ProjectRun extends Canvas implements Runnable, KeyListener {
-    
+   
     public Pista pista;
     public Player player;
     public Carros carros;
     public Consertar consertar;
     public static int width = 500, height = 500;
-    private boolean running =true;
+    private boolean running = true;
     
     
     public ProjectRun(){
@@ -22,8 +22,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         pista = new Pista();
         carros = new Carros(); 
         consertar = new Consertar();
-       
-        player = new Player(width/2,400, 32, 32, carros, consertar);
+        player = new Player(width/2,400,5, 32, 32, carros, consertar);
     }
     public static void main(String[] args) {
         ProjectRun projectRun = new ProjectRun();
@@ -35,17 +34,11 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         new Thread(projectRun).start();
-        
-    
     }
     public void tick(){
     player.tick();
     carros.tick(); 
     consertar.tick();
-    
-   
-    
-    
     }
     public void render(){
         BufferStrategy bs = this.getBufferStrategy();
@@ -60,14 +53,12 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         carros.render(g);
         consertar.render(g);
         player.render(g);
-       
         bs.show();
 
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -75,7 +66,6 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         int keyCode = e.getKeyCode();
         if(keyCode == KeyEvent.VK_RIGHT){
             player.right = true;
-
         }
         if(keyCode == KeyEvent.VK_LEFT){
             player.left = true;
@@ -86,8 +76,6 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         if (keyCode == KeyEvent.VK_DOWN){
             player.freiar = true;
         }
-
-
     }
 
     @Override
@@ -95,7 +83,6 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         int keyCode = e.getKeyCode();
         if(keyCode == KeyEvent.VK_RIGHT){
             player.right = false;
-
         }
         if(keyCode == KeyEvent.VK_LEFT){
             player.left = false;
@@ -118,15 +105,19 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
             }catch (Exception e){
                 e.printStackTrace();
             }
-        }
-      
+        }      
     }
 
     public void GameOver(){
         JOptionPane.showMessageDialog(null, "Game Over. Press OK to exit");
         running = false;
-        System.exit(0);
-
+        
+    }
+    public void gamereset(){
+        player = new Player(width/2,400,5, 32, 32, carros, consertar);
+        carros = new Carros();
+        consertar = new Consertar();
+        running = true;
     }
 }
 
