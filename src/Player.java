@@ -29,7 +29,7 @@ public class Player{
         if (vida <= 0){
             ProjectRun game = new ProjectRun();
             game.GameOver();
-            game.gamereset();
+            
             
         }
         
