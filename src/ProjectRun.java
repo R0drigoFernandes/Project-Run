@@ -112,12 +112,9 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         JOptionPane.showMessageDialog(null, "Game Over. Precione OK para reiniciar o jogo.");
         running = false;
         gamereset();
-        
     }
     public void gamereset(){
-
         main(null);
-        
     }
 }
 
