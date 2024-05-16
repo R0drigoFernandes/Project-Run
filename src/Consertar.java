@@ -45,11 +45,8 @@ public class Consertar {
 }
     
     public void render( Graphics g){
-        
             g.setColor(Color.cyan);
             g.fillOval(x, y, width, height);
-        
-       
     }
     
 }

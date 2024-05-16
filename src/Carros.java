@@ -9,10 +9,8 @@ public class Carros{
     
     
         
-    public Carros(){  
-        
-            carros.add(this);
-       
+    public Carros(){    
+    carros.add(this);
     }
     public boolean verificaColisao(Player player){
         if( this.x < player.x + player.width &&

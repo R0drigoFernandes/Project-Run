@@ -18,13 +18,8 @@ public class Player{
        this.height = height;
        this.carros = carros;
        this.consertar = consertar;
-       
-    
-
-
     }
     public void perderVida(){
-       
             vida--;
         if (vida <= 0){
             ProjectRun game = new ProjectRun();
