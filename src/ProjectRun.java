@@ -24,7 +24,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         this.addKeyListener(this);
         this.setPreferredSize(new Dimension(width, height));
         pista = new Pista();
-        carros = new Carros(); 
+        carros = new Carros();
         consertar = new Consertar();
         player = new Player(width/2,400,3, 32, 32, carros, consertar);
     }
@@ -42,7 +42,10 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     public void tick(){
     player.tick();
     carros.tick(); 
-    consertar.tick();
+    if(carros.pontos % 10 == 0){
+        consertar.tick();
+    }
+    
     }
     public void render(){
         BufferStrategy bs = this.getBufferStrategy();
@@ -55,6 +58,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         g.fillRect(0,0,width,height);
         pista.render(g);
         carros.render(g);
+        
         consertar.render(g);
         player.render(g);
         bs.show();
