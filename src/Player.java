@@ -33,7 +33,7 @@ public class Player{
        boolean pegar = consertar.verificaColisao(this);
         boolean colisao = carros.verificaColisao(this);
         if(pegar){
-            vida++;
+            vida = 3;
             consertar.remove = true;
         }else{
             consertar.remove = false;

@@ -8,7 +8,11 @@ import java.awt.image.BufferStrategy;
 // then press Enter. You can now see whitespace characters in your code.
 public class ProjectRun extends Canvas implements Runnable, KeyListener {
    
-    public Pista pista;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public Pista pista;
     public Player player;
     public Carros carros;
     public Consertar consertar;
@@ -22,7 +26,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         pista = new Pista();
         carros = new Carros(); 
         consertar = new Consertar();
-        player = new Player(width/2,400,5, 32, 32, carros, consertar);
+        player = new Player(width/2,400,3, 32, 32, carros, consertar);
     }
     public static void main(String[] args) {
         ProjectRun projectRun = new ProjectRun();
