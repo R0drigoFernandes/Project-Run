@@ -89,7 +89,6 @@ public class Menu extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == novoJogoButton) {
-            JOptionPane.showMessageDialog(this, "Iniciando um novo jogo...");
             ProjectRun game = new ProjectRun(); // Cria uma nova instância do jogo
             game.startGame(); // Chama o método para iniciar a janela do jogo e a thread
             this.dispose(); // Fecha a janela do menu
@@ -106,7 +105,7 @@ public class Menu extends JFrame implements ActionListener{
                 carregarJogoButton.setEnabled(false); // Desabilita o botão se não houver arquivo
             }
         } else if (e.getSource() == opcoesButton) {
-            JOptionPane.showMessageDialog(this, "Acessando opções do jogo...");
+            
             // Adicione a lógica para configurações do jogo aqui
         } else if (e.getSource() == sairButton) {
             int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja sair?", "Sair do Jogo", JOptionPane.YES_NO_OPTION);
