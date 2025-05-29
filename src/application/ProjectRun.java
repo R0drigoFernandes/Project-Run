@@ -130,7 +130,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     // Método chamado quando um carro passa para controlar a aparição do item de conserto
     public void carPassou() {
         carsPassedCount++;
-        if (carsPassedCount % 3 == 0) { // Se 3 carros passaram
+        if (carsPassedCount % 10 == 0) { // Se 3 carros passaram
             // Adiciona um novo item de conserto à lista
             consertar.consertarList.add(new Consertar((int)(Math.random()*(310 - 150 + 1) + 150), -10));
         }
@@ -252,7 +252,10 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         player.x = width / 2;
         player.y = 400;
         player.vida = 3;
-
+        player.acelerar = false;
+        player.freiar = false;
+        player.right = false;
+        player.left = false;
         carros.pontos = 0;
         carros.acelerar = 3;
         carros.contador = 0;

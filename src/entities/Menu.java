@@ -18,7 +18,11 @@ import application.SaveLoadManager;
 import java.io.File; // Importe para verificar a existência do arquivo de save
 
 public class Menu extends JFrame implements ActionListener{
-    private JButton novoJogoButton;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JButton novoJogoButton;
     private JButton carregarJogoButton;
     private JButton opcoesButton;
     private JButton sairButton;

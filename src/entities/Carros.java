@@ -82,7 +82,7 @@ public class Carros implements Serializable {
             }
 
             if(contador == 3){
-                if(acelerar < 20) { // Limita a velocidade máxima
+                if(acelerar < 15) { // Limita a velocidade máxima
                     // Aumenta a velocidade do carro a cada 3 carros passados
                     acelerar++;
                 }
