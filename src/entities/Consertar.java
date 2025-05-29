@@ -69,6 +69,6 @@ public class Consertar implements Serializable {
         // Renderiza apenas se não estiver marcado para remoção (se você quiser que ele desapareça imediatamente ao ser pego)
         // Ou, se você quiser um efeito visual de coleta antes de desaparecer, a lógica de renderização pode ser diferente.
         g.setColor(Color.CYAN); // Cor para o item de consertar (ex: kit de ferramentas)
-        g.fillRect(x, y, width, height);
+        g.fillOval(x, y, width, height);
     }
 }
