@@ -232,9 +232,11 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         if(JOptionPane.showConfirmDialog(null, "Jogar Novamente?")==0){
             gamereset();
         }
-        else{
+        else if(JOptionPane.showConfirmDialog(null, "Voltar ao Menu?")==0){
             SwingUtilities.invokeLater(() -> new Menu());
          // Fecha o jogo e abre o menu
+        }else{
+            System.exit(0);
         }
     }
 
