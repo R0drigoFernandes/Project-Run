@@ -148,15 +148,15 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         pista.render(g);
         player.render(g);
 
+        // Renderiza todos os itens de conserto na lista
+        for(Consertar item : consertar.consertarList){
+            item.render(g);
+        }
         // Renderiza todos os carros na lista
         for(Carros c : carros.activeCars){
             c.render(g);
         }
 
-        // Renderiza todos os itens de conserto na lista
-        for(Consertar item : consertar.consertarList){
-            item.render(g);
-        }
 
         g.dispose();
         bs.show();
@@ -233,7 +233,8 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
             gamereset();
         }
         else{
-            System.exit(0);
+            SwingUtilities.invokeLater(() -> new Menu());
+         // Fecha o jogo e abre o menu
         }
     }
 
