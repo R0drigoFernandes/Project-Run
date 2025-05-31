@@ -95,6 +95,7 @@ public class Player {
         g.fillRect(x, y, width, height);
         // Renderiza a vida do jogador
         g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString("Vida: " + vida, 10, 20);
         // Renderiza os pontos do jogador
        

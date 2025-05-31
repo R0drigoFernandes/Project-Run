@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.awt.Font;
 
 import application.ProjectRun; // Importe ProjectRun para acessar a instância de consertar global.
 
@@ -14,7 +15,7 @@ public class Carros implements Serializable {
     public int x, y, width, height; // Tornando x, y públicos para fácil acesso
     public int acelerar = 3, pontos = 0, contador = 0;
     public boolean remove;
-
+   
     // Esta ArrayList de Carros é para gerenciar as instâncias de carros em JOGO.
     // Ela não deve ser instanciada por cada 'new Carros()'.
     // A instância principal de 'Carros' em ProjectRun é que deve ter e gerenciar esta lista.
@@ -98,6 +99,7 @@ public class Carros implements Serializable {
         g.setColor(Color.RED);
         g.fillRect(x, y, width, height);
         g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString("Pontos: " + pontos, 10, 40);
     }
 }
