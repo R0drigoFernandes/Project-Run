@@ -97,7 +97,7 @@ public class Carros implements Serializable {
     public void render(Graphics g){
         g.setColor(Color.RED);
         g.fillRect(x, y, width, height);
-         g.setColor(Color.WHITE);
+        g.setColor(Color.WHITE);
         g.drawString("Pontos: " + pontos, 10, 40);
     }
 }
