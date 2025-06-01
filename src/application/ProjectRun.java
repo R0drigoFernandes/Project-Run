@@ -3,6 +3,8 @@ package application;
 import javax.swing.*;
 import entities.Carros;
 import entities.Consertar;
+import entities.Invencible; // Importe Invencible
+import entities.InvencibilityItem; // Importe InvencibilityItem
 import entities.Pista;
 import entities.Player;
 import entities.pauseMenu;
@@ -11,21 +13,25 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList; // Importe ArrayList
 import java.util.Iterator;
 
 public class ProjectRun extends Canvas implements Runnable, KeyListener {
 
     private static final long serialVersionUID = 1L;
-    public pauseMenu menu; // Instância do menu de pausa
+    public pauseMenu menu;
     public Pista pista;
     public Player player;
     public Carros carros;
     public Consertar consertar;
+    public Invencible invencible; // Adicione a instância de Invencible
+    public ArrayList<InvencibilityItem> invencibilityItems; // Lista para itens de invencibilidade
     public static int width = 500, height = 500;
     private boolean running = false;
-    private boolean paused = false; // NOVA FLAG DE PAUSE
+    private boolean paused = false;
 
     private int carsPassedCount = 0;
+    private int invencibilitySpawnThreshold = 10; // A cada 20 carros, um item de invencibilidade
 
     public ProjectRun(){
         this.addKeyListener(this);
@@ -34,7 +40,10 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         pista = new Pista();
         carros = new Carros();
         consertar = new Consertar();
-        player = new Player(width/2,400,3, 32, 32, carros, consertar);
+        invencible = new Invencible(); // Instancie Invencible
+        invencibilityItems = new ArrayList<>(); // Inicialize a lista de itens de invencibilidade
+
+        player = new Player(width/2,400,3, 32, 32, carros, consertar, invencible); // Passe invencible para o Player
         player.setGameReference(this);
 
         carros.activeCars.add(new Carros( (int)(Math.random()*(310 - 150 + 1) + 150), 0));
@@ -49,6 +58,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
             carros.acelerar,
             carros.contador,
             carsPassedCount
+            // Se quiser salvar o estado da invencibilidade, adicione aqui (active, startTime)
         );
     }
 
@@ -65,9 +75,11 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         carros.activeCars.add(new Carros( (int)(Math.random()*(310 - 150 + 1) + 150), 0));
 
         consertar.consertarList.clear();
-        if (carsPassedCount % 10 == 0 && carsPassedCount > 0) { // Ajuste para cada 10 carros passados
+        if (carsPassedCount % 10 == 0 && carsPassedCount > 0) {
              consertar.consertarList.add(new Consertar((int)(Math.random()*(310 - 150 + 1) + 150), -10));
         }
+        invencibilityItems.clear(); // Limpa itens de invencibilidade ao carregar
+        // Se invencibilidade for persistente, carregue seu estado aqui também
     }
 
     public void startGame() {
@@ -87,7 +99,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     }
 
     public void tick(){
-        if (paused) return; // Não atualiza o jogo se estiver pausado
+        if (paused) return;
 
         player.tick();
         Iterator<Carros> carIterator = carros.activeCars.iterator();
@@ -108,7 +120,18 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
                 consertarIterator.remove();
             }
         }
-        pista.tick(); // Atualiza a pista também
+
+        // Atualiza e remove itens de invencibilidade (NOVO)
+        Iterator<InvencibilityItem> invItemIterator = invencibilityItems.iterator();
+        while (invItemIterator.hasNext()) {
+            InvencibilityItem item = invItemIterator.next();
+            item.tick();
+            if (item.remove) {
+                invItemIterator.remove();
+            }
+        }
+
+        pista.tick();
     }
 
     public void render(){
@@ -123,10 +146,13 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         for(Consertar item : consertar.consertarList){
             item.render(g);
         }
+        for(InvencibilityItem item : invencibilityItems){ // Renderiza itens de invencibilidade
+            item.render(g);
+        }
         for(Carros c : carros.activeCars){
             c.render(g);
         }
-        player.render(g);
+        player.render(g); // Player renderiza o efeito de invencibilidade
 
         g.dispose();
         bs.show();
@@ -160,7 +186,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
             }
         }
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-        	togglePause(); // Chame o método para pausar/despausar
+            togglePause();
         }
     }
 
@@ -188,7 +214,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
    @Override
     public void run() {
         while(running){
-            if (!paused) { // Só chama tick e render se não estiver pausado
+            if (!paused) {
                 tick();
                 render();
             }
@@ -203,8 +229,12 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
 
     public void carPassou() {
         carsPassedCount++;
-        if (carsPassedCount % 10 == 0) { // Adiciona um item de conserto a cada 10 carros passados
+        if (carsPassedCount % 6 == 0) {
             consertar.consertarList.add(new Consertar((int)(Math.random()*(310 - 150 + 1) + 150), -10));
+        }
+        // Lógica para spawnar item de invencibilidade (NOVO)
+        if (carsPassedCount % invencibilitySpawnThreshold == 0 && carsPassedCount > 0) {
+            invencibilityItems.add(new InvencibilityItem((int)(Math.random()*(310 - 150 + 1) + 150), -10));
         }
     }
 
@@ -222,7 +252,6 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     }
 
     public void gamereset(){
-        // Resetar para os valores iniciais
         player.x = width / 2;
         player.y = 400;
         player.vida = 3;
@@ -239,9 +268,10 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         carros.activeCars.add(new Carros());
 
         consertar.consertarList.clear();
+        invencibilityItems.clear(); // Limpa itens de invencibilidade no reset
 
-        paused = false; // Garante que não está pausado ao resetar
-        if (!running) { // Se a thread estava parada, reinicia
+        paused = false;
+        if (!running) {
              running = true;
              new Thread(this).start();
         }
@@ -255,13 +285,13 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     }
 
     public void togglePause() {
-        paused = !paused; // Alterna o estado de pausa
+        paused = !paused;
         if (paused) {
-            menu = new pauseMenu(this); // Passa a referência de ProjectRun para o menu de pausa
+            menu = new pauseMenu(this);
             menu.setVisible(true);
         } else {
             if (menu != null) {
-                menu.dispose(); // Fecha o menu de pausa
+                menu.dispose();
             }
         }
     }
