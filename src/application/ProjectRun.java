@@ -5,7 +5,7 @@ import entities.Carros;
 import entities.Consertar;
 import entities.Invencible;
 import entities.InvencibilityItem;
-import entities.FicarLentoItem; // Importe FicarLentoItem
+import entities.FicarLentoItem;
 import entities.Pista;
 import entities.Player;
 import entities.pauseMenu;
@@ -23,43 +23,49 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     public pauseMenu menu;
     public Pista pista;
     public Player player;
-    public Carros carros;
+    public Carros carros; // Instância principal de Carros
     public Consertar consertar;
     public Invencible invencible;
     public ArrayList<InvencibilityItem> invencibilityItems;
-    public ArrayList<FicarLentoItem> slowItems; // Lista para itens de lentidão
+    public ArrayList<FicarLentoItem> slowItems;
     public static int width = 500, height = 500;
     private boolean running = false;
     private boolean paused = false;
 
     private int carsPassedCount = 0;
-    private int invencibilitySpawnThreshold = 10; // A cada 10 carros, um item de invencibilidade
-    private int slowItemSpawnThreshold = 15; // A cada 15 carros, um item de lentidão
-    private boolean slowEffectActive = false; // Flag para controlar o efeito de lentidão
-    private long slowEffectStartTime; // Tempo de início do efeito de lentidão
-    private final long slowEffectDuration = 5000; // Duração do efeito de lentidão em milissegundos (5 segundos)
-
+    private int invencibilitySpawnThreshold = 10;
+    private int slowItemSpawnThreshold = 15;
+    private boolean slowEffectActive = false;
+    private long slowEffectStartTime;
+    private final long slowEffectDuration = 5000;
 
     public ProjectRun(){
         this.addKeyListener(this);
         this.setPreferredSize(new Dimension(width, height));
-        this.setBackground(Color.BLACK); // Definindo a cor de fundo como preto
+        this.setBackground(Color.BLACK);
 
-        pista = new Pista(); // Corrigido: Construtor Pista()
-        player = new Player(width / 2, 400, 3, 32, 32, new Carros(), new Consertar(), new Invencible()); // Corrigido: Construtor Player() e instâncias de dependência
-        player.setGameReference(this); // Importante para que o Player possa acessar o ProjectRun
+        pista = new Pista();
+        carros = new Carros();
+        player = new Player(width / 2, 400, 3, 32, 32, carros, new Consertar(), new Invencible());
+        player.setGameReference(this);
 
-        carros = new Carros(); // Instância principal para gerenciar carros
-        carros.setGame(this); // Passa a referência de ProjectRun para Carros
-        carros.activeCars.add(new Carros()); // Adiciona o primeiro carro
+        carros.setGame(this); // Passa a referência de ProjectRun para a instância principal de Carros
 
-        consertar = new Consertar(); // Instância principal para gerenciar itens de conserto
-        invencible = new Invencible(); // Instância de invencibilidade
+        // Adiciona 5 carros iniciais em posições espaçadas para que apareçam gradualmente
+        for(int i = 0; i < 5; i++) {
+            carros.activeCars.add(new Carros(
+                (int)(Math.random()*(310 - 150 + 1) + 150), // x aleatório
+                -i * 100 - 50 // y para que eles apareçam acima da tela e espaçados
+            ));
+        }
+
+        consertar = new Consertar();
+        invencible = new Invencible();
         invencibilityItems = new ArrayList<>();
-        slowItems = new ArrayList<>(); // Inicializa a lista de itens de lentidão
+        slowItems = new ArrayList<>();
 
-        menu = new pauseMenu(this); // Passa a referência de ProjectRun para pauseMenu
-        menu.setVisible(false); // Inicia o menu de pausa invisível
+        menu = new pauseMenu(this);
+        menu.setVisible(false);
     }
 
     public synchronized void startGame(){
@@ -70,56 +76,76 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     public synchronized void stopGame(){
         running = false;
         try {
-            Thread.sleep(1); // Pequena pausa para a thread terminar
+            Thread.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public void tick(){
-        if(paused) return; // Se estiver pausado, não atualiza a lógica do jogo
+        if(paused) return;
 
-        // Atualiza a lógica de invencibilidade
         invencible.tick();
 
-        // Lógica para o efeito de lentidão
         if (slowEffectActive) {
             if (System.currentTimeMillis() - slowEffectStartTime >= slowEffectDuration) {
                 slowEffectActive = false;
-                carros.slow = false; // Desativa o efeito de lentidão nos carros
+                carros.slow = false;
             }
         }
 
-        // Atualiza os carros
-        carros.tick(); // Certifique-se de que Carros tem um método tick() que itera sobre activeCars e chama o tick de cada carro.
+        // Atualiza todos os carros ativos
+        // Usamos um loop for tradicional ou um iterador que não modifica a estrutura da lista
+        // para evitar ConcurrentModificationException.
+        // A melhor abordagem é reutilizar o objeto Carros que saiu da tela.
+        for (int i = 0; i < carros.activeCars.size(); i++) {
+            Carros car = carros.activeCars.get(i);
+            // Ajusta a velocidade com base na flag 'slow' da instância principal de Carros
+            car.y += (carros.slow ? carros.acelerar / 2 : carros.acelerar);
 
-        // Atualiza itens de conserto (Consertar)
+            if (car.y > ProjectRun.height) {
+                // Um carro saiu da tela, REUTILIZE-O e reposicione-o no topo
+                car.y = 0;
+                car.x = (int)(Math.random()*(310 - 150 + 1) + 150);
+
+                // Atualiza pontos e aceleração somente quando um carro é efetivamente "passado"
+                carros.pontos++;
+                carros.contador++;
+                if (carros.contador == 3) {
+                    if (!carros.slow && carros.acelerar < 13) {
+                        carros.acelerar++;
+                    }
+                    carros.contador = 0;
+                }
+                carPassou(); // Chama a lógica de spawn de itens
+            }
+        }
+
+
         Iterator<Consertar> consertarIterator = consertar.consertarList.iterator();
         while (consertarIterator.hasNext()) {
             Consertar item = consertarIterator.next();
             item.tick();
             if (item.verificaColisao(player)) {
                 player.vida++;
-                consertarIterator.remove(); // Remove o item após a colisão
+                consertarIterator.remove();
             } else if (item.remove) {
-                consertarIterator.remove(); // Remove se saiu da tela
+                consertarIterator.remove();
             }
         }
 
-        // Atualiza itens de invencibilidade
         Iterator<InvencibilityItem> invencibilityIterator = invencibilityItems.iterator();
         while (invencibilityIterator.hasNext()) {
             InvencibilityItem item = invencibilityIterator.next();
             item.tick();
             if (item.verificaColisao(player)) {
-                invencible.activate(); // Ativa a invencibilidade
+                invencible.activate();
                 invencibilityIterator.remove();
             } else if (item.remove) {
                 invencibilityIterator.remove();
             }
         }
 
-        // Atualiza itens de lentidão
         Iterator<FicarLentoItem> slowItemIterator = slowItems.iterator();
         while (slowItemIterator.hasNext()) {
             FicarLentoItem item = slowItemIterator.next();
@@ -127,15 +153,15 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
             if (item.verificaColisao(player)) {
                 slowEffectActive = true;
                 slowEffectStartTime = System.currentTimeMillis();
-                carros.slow = true; // Ativa o efeito de lentidão nos carros
+                carros.slow = true;
                 slowItemIterator.remove();
-            } else if (item.remove) { // Corrigido: FicarLentoItem.remove agora é public
+            } else if (item.remove) {
                 slowItemIterator.remove();
             }
         }
 
         player.tick();
-        pista.tick(); // Adicionado para animar a pista
+        pista.tick();
     }
 
     public void render(){
@@ -146,63 +172,49 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         }
         Graphics g = bs.getDrawGraphics();
 
-        pista.render(g); // Renderiza a pista
+        pista.render(g);
 
-        // Renderiza itens de conserto
         for (Consertar item : consertar.consertarList) {
             item.render(g);
         }
 
-        // Renderiza itens de invencibilidade
         for (InvencibilityItem item : invencibilityItems) {
             item.render(g);
         }
 
-        // Renderiza itens de lentidão
         for (FicarLentoItem item : slowItems) {
             item.render(g);
         }
 
-        player.render(g); // Renderiza o player
+        player.render(g);
 
         // Renderiza os carros (activeCars)
-        for(Carros car : carros.activeCars){ // Itera sobre a lista activeCars da instância de Carros
-            car.render(g);
-        }
+        carros.render(g); // Chama o método render da instância principal de Carros
 
-        invencible.render(g); // Renderiza o efeito de invencibilidade, se ativo
+        invencible.render(g);
 
-        // Pontuação
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString("Pontos: " + carros.pontos, 20, 30);
         g.drawString("Vida: " + player.vida, 20, 60);
-
-        if(paused){
-            // Não chame menu.render(g); diretamente. O JFrame se renderiza sozinho.
-            // A visibilidade do menu já é controlada por togglePause()
-        }
 
         g.dispose();
         bs.show();
     }
 
     public void carPassou(){
-        carsPassedCount++; // Incrementa o contador de carros passados
+        carsPassedCount++;
 
-        // Lógica para criar itens de conserto
-        if (carsPassedCount % 3 == 0) { // A cada 3 carros, cria um item de conserto
+        if (carsPassedCount % 3 == 0) {
             int randomX = (int)(Math.random()*(310 - 150 + 1) + 150);
             consertar.consertarList.add(new Consertar(randomX, 0));
         }
 
-        // Lógica para criar itens de invencibilidade
         if (carsPassedCount % invencibilitySpawnThreshold == 0) {
             int randomX = (int)(Math.random()*(310 - 150 + 1) + 150);
             invencibilityItems.add(new InvencibilityItem(randomX, 0));
         }
 
-        // Lógica para criar itens de lentidão
         if (carsPassedCount % slowItemSpawnThreshold == 0) {
             int randomX = (int)(Math.random()*(310 - 150 + 1) + 150);
             slowItems.add(new FicarLentoItem(randomX, 0));
@@ -244,7 +256,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if(paused) {
-            menu.keyPressed(e); // Passa o evento para o menu de pausa
+            menu.keyPressed(e);
             return;
         }
 
@@ -268,7 +280,7 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         if(paused) {
-            menu.keyReleased(e); // Passa o evento para o menu de pausa
+            menu.keyReleased(e);
             return;
         }
 
@@ -297,39 +309,38 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         carros.pontos = data.getCarrosPontos();
         carros.acelerar = data.getCarrosAcelerar();
         carros.contador = data.getCarrosContador();
-        carsPassedCount = data.getCarsPassedCount(); // Corrigido: getCarsPassedCount()
-        this.slowEffectActive = data.isSlowEffectActive(); // Carrega o estado do efeito de lentidão
-        this.slowEffectStartTime = data.getSlowEffectStartTime(); // Carrega o tempo de início
+        carsPassedCount = data.getCarsPassedCount();
+        this.slowEffectActive = data.isSlowEffectActive();
+        this.slowEffectStartTime = data.getSlowEffectStartTime();
 
         // Clear existing cars and add new ones based on loaded data (if you want to save/load individual car positions)
         // For simplicity, we are not saving individual car positions here.
-        // You might need to adjust Carros to be Serializable and iterate through activeCars.
         carros.activeCars.clear();
-        carros.activeCars.add(new Carros()); // Add at least one car
-
-        consertar.consertarList.clear(); // Clear existing repair items
-
-        invencibilityItems.clear(); // Limpa itens de invencibilidade ao carregar
-        slowItems.clear(); // Limpa itens de lentidão ao carregar
-
-        if (slowEffectActive) { // If slow effect was active, reapply it to cars
-            carros.slow = true;
+        // Adiciona 5 novos carros para que o jogo continue, em vez de carregar os antigos
+        for(int i = 0; i < 5; i++) {
+            carros.activeCars.add(new Carros(
+                (int)(Math.random()*(310 - 150 + 1) + 150),
+                -i * 100 - 50
+            ));
         }
 
-        // Se o jogo estava pausado ao salvar, ele deve começar pausado
-        // A lógica de pause está no menu de pausa, então não precisamos setar aqui
+        consertar.consertarList.clear();
+        invencibilityItems.clear();
+        slowItems.clear();
+
+        if (slowEffectActive) {
+            carros.slow = true;
+        }
     }
 
     public GameData getGameData() {
         return new GameData(player.x, player.y, player.vida,
                             carros.pontos, carros.acelerar, carros.contador,
-                            carsPassedCount, slowEffectActive, slowEffectStartTime); // Inclui os novos dados
+                            carsPassedCount, slowEffectActive, slowEffectStartTime);
     }
 
     public void gameOver() {
-        // Pausa o jogo
         stopGame();
-        // Exibe um JOptionPane
         int choice = JOptionPane.showConfirmDialog(this, "Game Over! Pontos: " + carros.pontos + "\nDeseja jogar novamente?", "Game Over", JOptionPane.YES_NO_OPTION);
 
         if(choice == JOptionPane.YES_OPTION){
@@ -353,15 +364,20 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
         carros.acelerar = 3;
         carros.contador = 0;
         carsPassedCount = 0;
-        slowEffectActive = false; // Reseta o efeito de lentidão
-        carros.slow = false; // Garante que os carros não estão lentos
+        slowEffectActive = false;
+        carros.slow = false;
 
         carros.activeCars.clear();
-        carros.activeCars.add(new Carros());
+        for(int i = 0; i < 5; i++) { // Adiciona 5 carros iniciais novamente
+            carros.activeCars.add(new Carros(
+                (int)(Math.random()*(310 - 150 + 1) + 150),
+                -i * 100 - 50
+            ));
+        }
 
         consertar.consertarList.clear();
         invencibilityItems.clear();
-        slowItems.clear(); // Limpa itens de lentidão no reset
+        slowItems.clear();
 
         paused = false;
         if (!running) {
@@ -380,19 +396,18 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     public void togglePause() {
         paused = !paused;
         if (paused) {
-            // Se o menu já estiver instanciado, apenas o torna visível
-            if (menu == null) { // Caso seja a primeira vez que o menu é aberto
+            if (menu == null) {
                 menu = new pauseMenu(this);
             }
-            menu.setVisible(true); // Mostra o menu de pausa
-            setFocusable(false); // Remove o foco do canvas para que o menu receba eventos de teclado
-            menu.requestFocusInWindow(); // Solicita o foco para o menu
+            menu.setVisible(true);
+            setFocusable(false);
+            menu.requestFocusInWindow();
         } else {
             if (menu != null) {
-                menu.dispose(); // Fecha o menu de pausa
+                menu.dispose();
             }
-            setFocusable(true); // Devolve o foco para o canvas
-            requestFocusInWindow(); // Solicita o foco para o canvas
+            setFocusable(true);
+            requestFocusInWindow();
         }
     }
 

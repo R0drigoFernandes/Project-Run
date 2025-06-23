@@ -12,14 +12,19 @@ import application.ProjectRun;
 public class Carros implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public int x, y, width, height;
-    public int acelerar = 3, pontos = 0, contador = 0;
+    public int x, y, width, height; // Estas são as coordenadas e dimensões para UMA instância de carro individual
+    public int acelerar = 3, pontos = 0, contador = 0; // Estas deveriam ser controladas pela instância principal de Carros em ProjectRun
     public boolean remove;
-    public boolean slow = false; // Nova flag para controlar o efeito de lentidão
+    public boolean slow = false; // Flag para controlar o efeito de lentidão (na instância principal)
 
-    public ArrayList<Carros> activeCars = new ArrayList<>();
-    private ProjectRun game; // Referência para ProjectRun
+    // Esta lista pertence à ÚNICA instância de 'Carros' gerenciada por ProjectRun.
+    // Ela não deveria ser criada para cada Carro individual que é adicionado a ela.
+    // A instância de Carros que é criada em ProjectRun terá esta lista.
+    public ArrayList<Carros> activeCars = new ArrayList<>(); // Lista de carros que estão na tela
 
+    public ProjectRun game; // Referência para ProjectRun
+
+    // Construtor para CARROS INDIVIDUAIS que são adicionados à lista activeCars
     public Carros(int x, int y) {
         this.x = x;
         this.y = y;
@@ -28,51 +33,33 @@ public class Carros implements Serializable {
         this.remove = false;
     }
 
-    // Construtor padrão (adicionado para inicialização em ProjectRun)
+    // Construtor padrão. Esta é a instância que estará em ProjectRun (public Carros carros;).
+    // Ela não representa um carro na tela, mas sim o "gerenciador" de carros.
     public Carros() {
-        this.x = (int)(Math.random()*(310 - 150 + 1) + 150);
-        this.y = 0;
-        this.width = 32;
-        this.height = 32;
-        this.remove = false;
+        // Nada a inicializar para um carro individual aqui.
+        // As variáveis de jogo (acelerar, pontos, contador) são desta instância.
     }
 
     public void setGame(ProjectRun game) {
         this.game = game;
     }
 
+    // Este método tick() e render() só devem ser chamados para a INSTÂNCIA PRINCIPAL de Carros em ProjectRun.
+    // Ele itera sobre activeCars e chama o tick/render de cada carro individual.
     public void tick() {
-        // Itera sobre a lista de carros ativos para mover e verificar a remoção de itens com um Iterator se necessário
-        for(int i = 0; i < activeCars.size(); i++) {
-            Carros car = activeCars.get(i);
-            // Ajusta a velocidade com base na flag 'slow'
-            car.y += (slow ? acelerar / 2 : acelerar); // Se slow for true, a velocidade é metade
-
-            if(car.y > ProjectRun.height){
-                // Um carro saiu da tela, "remove" ele e cria um novo na parte superior
-                car.y = 0;
-                car.x = (int)(Math.random()*(310 - 150 + 1) + 150);
-
-                // Apenas para a instância principal de Carros que está em ProjectRun
-                // (onde `pontos`, `contador` e `acelerar` são realmente usados para o jogo)
-                if (game != null) { // Verifica se a referência ao jogo está disponível
-                    pontos++; // Atualiza a pontuação na instância principal
-                    game.carPassou(); // Notifica ProjectRun que um carro passou
-                    contador++; // Incrementa o contador para aceleração
-                    if(contador == 3){
-                        if(!slow && acelerar < 13) { // Acelera apenas se não estiver lento e abaixo do limite
-                            acelerar++;
-                        }
-                        contador = 0;
-                    }
-                }
-            }
-        }
+        // A lógica de movimento e remoção dos carros individuais foi movida para ProjectRun.tick()
+        // para que ProjectRun possa gerenciar a adição/remoção da lista activeCars.
+        // Este método 'tick' aqui é para a INSTÂNCIA PRINCIPAL de Carros
+        // Se você quiser que cada carro individual tenha seu próprio 'tick', você precisa ter:
+        // public void tickIndividual() { /* lógica de movimento de um carro */ }
+        // E chamá-lo em ProjectRun.tick() para cada 'car' em 'carros.activeCars'.
+        // No entanto, a lógica de respawn e pontuação é melhor no ProjectRun.
     }
 
     // Método verificaColisao para verificar colisão com o Player
     public boolean verificaColisao(Player player) {
-        // Verifica se a caixa delimitadora do carro colide com a caixa delimitadora do player
+        // Este método é chamado para cada *carro individual* na lista `activeCars`.
+        // Portanto, ele usa as coordenadas (this.x, this.y) do carro individual.
         if (this.x < player.x + player.width &&
             this.x + this.width > player.x &&
             this.y < player.y + player.height &&
@@ -84,10 +71,10 @@ public class Carros implements Serializable {
 
     public void render(Graphics g){
         g.setColor(Color.RED);
-        // Renderiza cada carro ativo na lista
+        // Renderiza cada carro ativo na lista 'activeCars' desta instância principal de Carros
         for(int i = 0; i < activeCars.size(); i++) {
-            Carros car = activeCars.get(i);
-            g.fillRect(car.x, car.y, car.width, car.height);
+            Carros car = activeCars.get(i); // Obtém o carro individual
+            g.fillRect(car.x, car.y, car.width, car.height); // Renderiza as coordenadas do carro individual
         }
     }
 }
