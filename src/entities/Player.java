@@ -25,6 +25,12 @@ public class Player {
         this.invencible = invencible; // Inicialize a instância de Invencible
     }
 
+    // Adicionado um construtor mais simples, se necessário, mas o acima é preferível
+    // public Player(int x, int y) {
+    //     this(x, y, 3, 32, 32, null, null, new Invencible()); // Valores padrão, você pode ajustar
+    // }
+
+
     public void setGameReference(ProjectRun game) {
         this.gameRef = game;
     }
@@ -35,7 +41,7 @@ public class Player {
             vida--;
             if (vida <= 0) {
                 if (gameRef != null) {
-                    gameRef.GameOver();
+                    gameRef.gameOver();
                 } else {
                     System.err.println("Erro: Referência do jogo não definida no Player. Não é possível chamar GameOver.");
                 }
@@ -50,7 +56,7 @@ public class Player {
         for (int i = 0; i < gameRef.consertar.consertarList.size(); i++) {
             Consertar itemConsertar = gameRef.consertar.consertarList.get(i);
             if (itemConsertar.verificaColisao(this)) {
-                if (vida < 3) {
+                if (vida < 3) { // Aumenta vida até o máximo de 3 (ou o que você definir)
                     vida = 3;
                 }
                 itemConsertar.remove = true;
@@ -59,7 +65,6 @@ public class Player {
         }
 
         // Colisão com itens de invencibilidade (NOVO)
-        // Você precisará de uma lista de InvencibilityItem em ProjectRun
         for (int i = 0; i < gameRef.invencibilityItems.size(); i++) {
             InvencibilityItem invItem = gameRef.invencibilityItems.get(i);
             if (invItem.verificaColisao(this)) {
@@ -68,6 +73,18 @@ public class Player {
                 break;
             }
         }
+
+        // Colisão com itens de lentidão (NOVO)
+        for (int i = 0; i < gameRef.slowItems.size(); i++) {
+            FicarLentoItem slowItem = gameRef.slowItems.get(i);
+            if (slowItem.verificaColisao(this)) {
+                // A lógica de ativar o efeito de lentidão nos carros é feita em ProjectRun.tick()
+                // Este método apenas precisa retornar true para que ProjectRun possa remover o item
+                slowItem.remove = true; // Marca o item para remoção
+                break;
+            }
+        }
+
 
         // Colisão com carros
         boolean colisaoCarro = false;
@@ -110,9 +127,6 @@ public class Player {
     public void render(Graphics g) {
         g.setColor(Color.BLUE);
         g.fillRect(x, y, width, height);
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Vida: " + vida, 10, 20);
-        invencible.render(g); // Renderiza o efeito visual da invencibilidade
+        // A renderização da vida e do efeito de invencibilidade agora é feita em ProjectRun.render()
     }
 }

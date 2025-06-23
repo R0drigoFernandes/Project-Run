@@ -18,9 +18,13 @@ public class GameData implements Serializable {
     // Dados do Consertar
     private int carsPassedCount; // Agora salva o contador de carros passados para controlar o Consertar
 
+    // Dados do FicarLentoItem
+    private boolean slowEffectActive;
+    private long slowEffectStartTime;
+
     public GameData(int playerX, int playerY, int playerVida,
                     int carrosPontos, int carrosAcelerar, int carrosContador,
-                    int carsPassedCount) { // Atualizado para usar carsPassedCount
+                    int carsPassedCount, boolean slowEffectActive, long slowEffectStartTime) { // Atualizado
         this.playerX = playerX;
         this.playerY = playerY;
         this.playerVida = playerVida;
@@ -28,6 +32,8 @@ public class GameData implements Serializable {
         this.carrosAcelerar = carrosAcelerar;
         this.carrosContador = carrosContador;
         this.carsPassedCount = carsPassedCount;
+        this.slowEffectActive = slowEffectActive;
+        this.slowEffectStartTime = slowEffectStartTime;
     }
 
     // Getters para acessar os dados salvos
@@ -55,7 +61,15 @@ public class GameData implements Serializable {
         return carrosContador;
     }
 
-    public int getConsertarCount() { // Getter para o novo nome do contador
+    public int getCarsPassedCount() {
         return carsPassedCount;
+    }
+
+    public boolean isSlowEffectActive() {
+        return slowEffectActive;
+    }
+
+    public long getSlowEffectStartTime() {
+        return slowEffectStartTime;
     }
 }

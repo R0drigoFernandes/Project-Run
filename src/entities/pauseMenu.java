@@ -7,6 +7,8 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener; // Importe KeyListener
 
 import application.ProjectRun; // Importando ProjectRun
 import application.SaveLoadManager;
@@ -16,9 +18,10 @@ import javax.swing.BorderFactory;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JOptionPane; // Para mensagens de feedback
+import java.awt.GridLayout;
 
 
-public class pauseMenu extends JFrame implements ActionListener {
+public class pauseMenu extends JFrame implements ActionListener, KeyListener { // Implemente KeyListener
 
     private JButton continuarButton;
     private JButton restartButton;
@@ -41,67 +44,44 @@ public class pauseMenu extends JFrame implements ActionListener {
         setSize(400, 450); // Aumentado para acomodar os botões
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // Não fechar o jogo inteiro
         setLocationRelativeTo(null);
-        setResizable(false); // Desabilita o redimensionamento da janela
+        setResizable(false); // Desativa o redimensionamento
+
+        // Adiciona o KeyListener ao JFrame do menu de pausa
+        this.addKeyListener(this);
+        setFocusable(true); // Garante que o menu pode receber foco para eventos de teclado
+
 
         panel = new JPanel();
-        panel.setLayout(null);
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
+        panel.setLayout(new GridLayout(6, 1, 10, 10)); // 6 linhas, 1 coluna, espaçamento
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30)); // Margens internas
         panel.setBackground(Color.DARK_GRAY);
 
+        Font buttonFont = new Font("Arial", Font.BOLD, 18);
+        Color buttonColor = new Color(70, 130, 180);
+        Color textColor = Color.WHITE;
+
         continuarButton = new JButton("Continuar");
-        restartButton = new JButton("Reiniciar");
+        restartButton = new JButton("Reiniciar Jogo");
         saveButton = new JButton("Salvar Jogo");
         carregarJogoButton = new JButton("Carregar Jogo");
         opcoesButton = new JButton("Opções");
         sairButton = new JButton("Sair");
 
-        Font buttonFont = new Font("Arial", Font.BOLD, 18); // Fonte maior
-        Color buttonBg = new Color(70, 130, 180); // SteelBlue
-        Color buttonFg = Color.WHITE;
+        JButton[] buttons = {continuarButton, restartButton, saveButton, carregarJogoButton, opcoesButton, sairButton};
+        for (JButton button : buttons) {
+            button.setFont(buttonFont);
+            button.setBackground(buttonColor);
+            button.setForeground(textColor);
+            button.setFocusPainted(false);
+            button.addActionListener(this);
+            panel.add(button);
+        }
 
-        int buttonWidth = 200;
-        int buttonHeight = 40;
-        int spacing = 15;
-        int startY = 30;
-        int centerX = (getWidth() - buttonWidth) / 2; // Centraliza os botões
-
-        setupButton(continuarButton, buttonFont, buttonBg, buttonFg, centerX, startY, buttonWidth, buttonHeight);
-        setupButton(restartButton, buttonFont, buttonBg, buttonFg, centerX, startY + (buttonHeight + spacing), buttonWidth, buttonHeight);
-        setupButton(saveButton, buttonFont, buttonBg, buttonFg, centerX, startY + 2 * (buttonHeight + spacing), buttonWidth, buttonHeight);
-        setupButton(carregarJogoButton, buttonFont, buttonBg, buttonFg, centerX, startY + 3 * (buttonHeight + spacing), buttonWidth, buttonHeight);
-        setupButton(opcoesButton, buttonFont, buttonBg, buttonFg, centerX, startY + 4 * (buttonHeight + spacing), buttonWidth, buttonHeight);
-        setupButton(sairButton, buttonFont, buttonBg, buttonFg, centerX, startY + 5 * (buttonHeight + spacing), buttonWidth, buttonHeight);
-
-
-        continuarButton.addActionListener(this);
-        restartButton.addActionListener(this);
-        saveButton.addActionListener(this);
-        carregarJogoButton.addActionListener(this);
-        opcoesButton.addActionListener(this);
-        sairButton.addActionListener(this);
-
-        panel.add(continuarButton);
-        panel.add(restartButton);
-        panel.add(saveButton);
-        panel.add(carregarJogoButton);
-        panel.add(opcoesButton);
-        panel.add(sairButton);
-
+        // Verificar se existe um jogo salvo para habilitar o botão de carregar
         File saveFile = new File(SaveLoadManager.SAVE_FILE_NAME);
         carregarJogoButton.setEnabled(saveFile.exists());
 
         add(panel);
-        setVisible(true);
-
-    }
-
-    private void setupButton(JButton button, Font font, Color bgColor, Color fgColor, int x, int y, int width, int height) {
-        button.setFont(font);
-        button.setBackground(bgColor);
-        button.setForeground(fgColor);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
-        button.setBounds(x, y, width, height);
     }
 
     @Override
@@ -112,8 +92,9 @@ public class pauseMenu extends JFrame implements ActionListener {
         } else if (e.getSource() == restartButton) {
             int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja reiniciar o jogo?", "Reiniciar Jogo", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                game.gamereset(); // Reinicia o jogo através da referência
                 dispose(); // Fecha o menu de pausa
+                game.gamereset(); // Reinicia o jogo
+                game.togglePause(); // Despausa o jogo após o reset
             }
         } else if (e.getSource() == saveButton) {
             SaveLoadManager.saveGame(game.getGameData()); // Salva o estado atual do jogo
@@ -140,4 +121,29 @@ public class pauseMenu extends JFrame implements ActionListener {
             }
         }
     }
+
+    // Métodos KeyListener
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // Não utilizado
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_P) {
+            // Se P for pressionado enquanto o menu de pausa está ativo, ele o fecha
+            if (this.isVisible()) {
+                dispose();
+                game.togglePause();
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // Não utilizado
+    }
+
+    // Remove o método render(Graphics g) daqui. JFrame se desenha automaticamente.
+    // Se você precisa desenhar algo personalizado, faça isso em um JPanel dentro do JFrame.
 }

@@ -40,9 +40,9 @@ public class InvencibilityItem implements Serializable {
         }
     }
 
-    // Renderiza o item na tela
+    // Renderiza o item
     public void render(Graphics g) {
-        g.setColor(Color.MAGENTA); // Cor para o item de invencibilidade (ex: uma estrela roxa)
-        g.fillOval(x, y, width, height); // Exemplo de forma (um círculo/oval)
+        g.setColor(Color.YELLOW); // Cor do item de invencibilidade (exemplo)
+        g.fillRect(x, y, width, height);
     }
 }

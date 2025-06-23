@@ -1,11 +1,12 @@
 package entities;
 
 import java.awt.*;
+import application.ProjectRun;
 
 public class Invencible {
     private boolean active; // Indica se a invencibilidade está ativa
     private long startTime; // Tempo em que a invencibilidade foi ativada
-    private long duration = 7000; // Duração da invencibilidade em milissegundos (5 segundos)
+    private long duration = 7000; // Duração da invencibilidade em milissegundos (7 segundos)
 
     public Invencible() {
         this.active = false;
@@ -37,7 +38,8 @@ public class Invencible {
         if (active) {
             // Desenha um retângulo semi-transparente sobre a tela
             g.setColor(new Color(255, 255, 0, 128)); // Amarelo semi-transparente
-            g.fillRect(0, 0, 500, 500); // Adapte 500, 500 para as dimensões da sua tela se necessário
+            // Ajuste as coordenadas e tamanho para cobrir a tela do jogo
+            g.fillRect(0, 0, ProjectRun.width, ProjectRun.height);
         }
     }
 }

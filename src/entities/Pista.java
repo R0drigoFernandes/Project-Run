@@ -1,10 +1,18 @@
 package entities;
 import java.awt.Graphics;
 import java.awt.Color;
-public class Pista {
+import java.io.Serializable; // Adicione esta importação
+
+public class Pista implements Serializable { // Implemente Serializable
+    private static final long serialVersionUID = 1L; // Adicione um serialVersionUID
     // Adicionar uma variável para o offset das linhas da pista
     private int lineOffsetY = 0;
     private final int LINE_SPEED = 3; // Velocidade com que as linhas se movem
+
+    // Construtor padrão sem parâmetros
+    public Pista() {
+        // Nada especial para inicializar aqui, os valores padrão já estão definidos
+    }
 
     public void tick() {
         lineOffsetY += LINE_SPEED;
