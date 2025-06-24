@@ -1,45 +1,66 @@
 package entities;
 
-import java.awt.*;
-import application.ProjectRun;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.io.Serializable;
+import java.awt.Font;
+public class Invencible implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-public class Invencible {
-    private boolean active; // Indica se a invencibilidade está ativa
-    private long startTime; // Tempo em que a invencibilidade foi ativada
+    private boolean active;
+    private long startTime;
     private long duration = 7000; // Duração da invencibilidade em milissegundos (7 segundos)
 
     public Invencible() {
         this.active = false;
+        this.startTime = 0;
     }
 
-    // Retorna se a invencibilidade está ativa
+    public void activateWithTime(long savedStartTime) {
+        this.active = true;
+        this.startTime = savedStartTime;
+    }
+
     public boolean isActive() {
         return active;
     }
 
-    // Ativa a invencibilidade e registra o tempo de início
+    public long getStartTime() {
+        return startTime;
+    }
+
     public void activate() {
         this.active = true;
         this.startTime = System.currentTimeMillis();
     }
 
-    // Atualiza o estado da invencibilidade a cada "tick" do jogo
+    public void deactivate() {
+        this.active = false;
+        this.startTime = 0;
+    }
+
     public void tick() {
         if (active) {
-            // Se o tempo atual menos o tempo de início for maior ou igual à duração, desativa
             if (System.currentTimeMillis() - startTime >= duration) {
                 active = false;
+                System.out.println("Invencibilidade desativada.");
             }
         }
     }
 
-    // Renderiza um efeito visual para indicar a invencibilidade
-    public void render(Graphics g) {
+    // MÉTODO RENDER: Adiciona parâmetros para posição e tamanho do player
+    public void render(Graphics g, int playerX, int playerY, int playerWidth, int playerHeight) {
         if (active) {
-            // Desenha um retângulo semi-transparente sobre a tela
-            g.setColor(new Color(255, 255, 0, 128)); // Amarelo semi-transparente
-            // Ajuste as coordenadas e tamanho para cobrir a tela do jogo
-            g.fillRect(0, 0, ProjectRun.width, ProjectRun.height);
+            // Efeito visual de invencibilidade ao redor do player
+            g.setColor(Color.YELLOW); // Amarelo transparente (RGBA)
+
+            // Desenha um círculo maior que o player para simular um "escudo"
+            int padding = 5; // Adiciona um pequeno espaço ao redor do player
+            g.fillOval(playerX - padding, playerY - padding, playerWidth + (padding * 2), playerHeight + (padding * 2));
+            g.setFont(new Font("Negrito", Font.BOLD, 12)); // Ajusta o tamanho da fonte
+            g.setColor(Color.WHITE); // Cor do texto
+            int textWidth = g.getFontMetrics().stringWidth("Invencível!");
+            g.drawString("Invencível!", playerX + (playerWidth / 2) - (textWidth / 2), playerY + playerHeight + 20);
         }
     }
 }

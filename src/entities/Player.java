@@ -1,132 +1,109 @@
 package entities;
 
-import java.awt.*;
-import application.ProjectRun;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.io.Serializable; // Certifique-se de importar Serializable
 
+public class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-public class Player {
+    public int x, y, width, height;
+    public int playerVida = 3;
+    // Flags para movimento em 4 direções (left, right, up, down)
+    public boolean right, left, up, down;
+    public int spd = 3; // Velocidade de movimento horizontal e vertical
 
-    public Carros carros;
-    public Consertar consertar;
-    public Invencible invencible; // Adicione a referência para Invencible
-    public int x, y, width, height, vida, spd = 4;
-    public boolean right, left, acelerar, freiar;
-    private ProjectRun gameRef;
+    // Para o efeito de lentidão
+    public boolean slowEffectActive = false;
+    public long slowEffectStartTime = 0;
+    private long slowEffectDuration = 5000; // 5 segundos de lentidão
 
-    // Atualize o construtor para receber a instância de Invencible
-    public Player(int x, int y, int vida, int width, int height, Carros carros, Consertar consertar, Invencible invencible) {
+    public Player(int x, int y) {
         this.x = x;
         this.y = y;
-        this.vida = vida;
-        this.width = width;
-        this.height = height;
-        this.carros = carros;
-        this.consertar = consertar;
-        this.invencible = invencible; // Inicialize a instância de Invencible
+        this.width = 32;
+        this.height = 32;
     }
 
-    // Adicionado um construtor mais simples, se necessário, mas o acima é preferível
-    // public Player(int x, int y) {
-    //     this(x, y, 3, 32, 32, null, null, new Invencible()); // Valores padrão, você pode ajustar
-    // }
+    // Getters
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getVida() { return playerVida; }
+    public boolean isSlowEffectActive() { return slowEffectActive; }
+    public long getSlowEffectStartTime() { return slowEffectStartTime; }
 
-
-    public void setGameReference(ProjectRun game) {
-        this.gameRef = game;
-    }
-
-    public void perderVida() {
-        // Verifica se o jogador NÃO está invencível antes de perder vida
-        if (!invencible.isActive()) {
-            vida--;
-            if (vida <= 0) {
-                if (gameRef != null) {
-                    gameRef.gameOver();
-                } else {
-                    System.err.println("Erro: Referência do jogo não definida no Player. Não é possível chamar GameOver.");
-                }
-            }
-        }
-    }
+    // Setters (para salvar/carregar ou ativar efeitos)
+    public void setX(int x) { this.x = x; }
+    public void setY(int y) { this.y = y; }
+    public void setVida(int vida) { this.playerVida = vida; }
+    public void setSlowEffectActive(boolean slowEffectActive) { this.slowEffectActive = slowEffectActive; }
+    public void setSlowEffectStartTime(long slowEffectStartTime) { this.slowEffectStartTime = slowEffectStartTime; }
 
     public void tick() {
-        invencible.tick(); // Atualiza o estado da invencibilidade a cada tick
-
-        // Colisão com itens de conserto
-        for (int i = 0; i < gameRef.consertar.consertarList.size(); i++) {
-            Consertar itemConsertar = gameRef.consertar.consertarList.get(i);
-            if (itemConsertar.verificaColisao(this)) {
-                if (vida < 3) { // Aumenta vida até o máximo de 3 (ou o que você definir)
-                    vida = 3;
-                }
-                itemConsertar.remove = true;
-                break;
-            }
+        int currentSpd = spd;
+        if (slowEffectActive) {
+            currentSpd = spd / 2; // Metade da velocidade se o efeito de lentidão estiver ativo
         }
 
-        // Colisão com itens de invencibilidade (NOVO)
-        for (int i = 0; i < gameRef.invencibilityItems.size(); i++) {
-            InvencibilityItem invItem = gameRef.invencibilityItems.get(i);
-            if (invItem.verificaColisao(this)) {
-                invencible.activate(); // Ativa a invencibilidade ao colidir
-                invItem.remove = true; // Marca o item para remoção
-                break;
-            }
-        }
-
-        // Colisão com itens de lentidão (NOVO)
-        for (int i = 0; i < gameRef.slowItems.size(); i++) {
-            FicarLentoItem slowItem = gameRef.slowItems.get(i);
-            if (slowItem.verificaColisao(this)) {
-                // A lógica de ativar o efeito de lentidão nos carros é feita em ProjectRun.tick()
-                // Este método apenas precisa retornar true para que ProjectRun possa remover o item
-                slowItem.remove = true; // Marca o item para remoção
-                break;
-            }
-        }
-
-
-        // Colisão com carros
-        boolean colisaoCarro = false;
-        for (int i = 0; i < gameRef.carros.activeCars.size(); i++) {
-            Carros carro = gameRef.carros.activeCars.get(i);
-            if (carro.verificaColisao(this)) {
-                colisaoCarro = true;
-                carro.remove = true;
-                break;
-            }
-        }
-
-        if (colisaoCarro) {
-            perderVida(); // Chama perderVida, que agora verifica a invencibilidade
-        }
-
-        // Movimento do jogador
+        // Lógica de movimento para 4 direções
         if (right) {
-            if (x < ProjectRun.width - width - 150) {
-                x += spd;
-            }
+            x += currentSpd;
         }
         if (left) {
-            if (x > 150) {
-                x -= spd;
-            }
+            x -= currentSpd;
         }
-        if (acelerar) {
-            if (y > 0) {
-                y -= spd;
-            }
+        if (up) {
+            y -= currentSpd;
         }
-        if (freiar) {
-            if (y < ProjectRun.height - height) {
-                y += spd;
+        if (down) {
+            y += currentSpd;
+        }
+
+        // Limites da pista e da tela
+        // Importante: ProjectRun.width e Pista.GRASS_WIDTH devem ser STATIC para acesso aqui
+        if (x + width > application.ProjectRun.width - Pista.GRASS_WIDTH) { // Limite direito da pista
+            x = application.ProjectRun.width - Pista.GRASS_WIDTH - width;
+        }
+        if (x < Pista.GRASS_WIDTH) { // Limite esquerdo da pista
+            x = Pista.GRASS_WIDTH;
+        }
+        if (y + height > application.ProjectRun.height) { // Limite inferior da tela
+            y = application.ProjectRun.height - height;
+        }
+        if (y < 0) { // Limite superior da tela
+            y = 0;
+        }
+
+        // Atualiza o efeito de lentidão
+        updateSlowEffect();
+    }
+
+    // Verifica e desativa o efeito de lentidão se o tempo expirou
+    public void updateSlowEffect() {
+        if (slowEffectActive) {
+            if (System.currentTimeMillis() - slowEffectStartTime >= slowEffectDuration) {
+                slowEffectActive = false;
+                System.out.println("Efeito de lentidão desativado.");
             }
         }
     }
 
+    // Renderiza o player
     public void render(Graphics g) {
-        g.setColor(Color.BLUE);
+        if (slowEffectActive) {
+            g.setColor(new Color(0, 255, 255, 150)); // Ciano transparente quando lento
+            g.fillRect(x, y, width, height);
+        }
+        g.setColor(Color.BLUE); // Cor do player
         g.fillRect(x, y, width, height);
-        // A renderização da vida e do efeito de invencibilidade agora é feita em ProjectRun.render()
+        // Opcional: Desenhar um contorno ou imagem para o player
+    }
+
+    // Método para verificar colisão com um objeto Carro
+    public boolean verificaColisao(Carros carro) {
+        return this.x < carro.x + carro.width &&
+               this.x + this.width > carro.x &&
+               this.y < carro.y + carro.height &&
+               this.y + this.height > carro.y;
     }
 }

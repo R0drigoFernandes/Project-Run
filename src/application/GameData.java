@@ -10,30 +10,33 @@ public class GameData implements Serializable {
     private int playerY;
     private int playerVida;
 
-    // Dados dos Carros
-    private int carrosPontos;
-    private int carrosAcelerar; // Velocidade dos carros
-    private int carrosContador; // Contador interno dos carros (de Carros)
-
-    // Dados do Consertar
-    private int carsPassedCount; // Agora salva o contador de carros passados para controlar o Consertar
+    // Dados do Jogo Global (anteriormente em 'Carros' ou dispersos)
+    private int gamePoints;
+    private int gameCarSpeed;
+    private int carsPassedCount;        // Contador para spawn de itens e aceleração
 
     // Dados do FicarLentoItem
     private boolean slowEffectActive;
     private long slowEffectStartTime;
 
+    // Dados do Invencible (para persistir o estado de invencibilidade)
+    private boolean invencibleActive;
+    private long invencibleStartTime;
+
     public GameData(int playerX, int playerY, int playerVida,
-                    int carrosPontos, int carrosAcelerar, int carrosContador,
-                    int carsPassedCount, boolean slowEffectActive, long slowEffectStartTime) { // Atualizado
+                    int gamePoints, int gameCarSpeed, int carsPassedCount,
+                    boolean slowEffectActive, long slowEffectStartTime,
+                    boolean invencibleActive, long invencibleStartTime) {
         this.playerX = playerX;
         this.playerY = playerY;
         this.playerVida = playerVida;
-        this.carrosPontos = carrosPontos;
-        this.carrosAcelerar = carrosAcelerar;
-        this.carrosContador = carrosContador;
+        this.gamePoints = gamePoints;
+        this.gameCarSpeed = gameCarSpeed;
         this.carsPassedCount = carsPassedCount;
         this.slowEffectActive = slowEffectActive;
         this.slowEffectStartTime = slowEffectStartTime;
+        this.invencibleActive = invencibleActive;
+        this.invencibleStartTime = invencibleStartTime;
     }
 
     // Getters para acessar os dados salvos
@@ -49,16 +52,12 @@ public class GameData implements Serializable {
         return playerVida;
     }
 
-    public int getCarrosPontos() {
-        return carrosPontos;
+    public int getGamePoints() {
+        return gamePoints;
     }
 
-    public int getCarrosAcelerar() {
-        return carrosAcelerar;
-    }
-
-    public int getCarrosContador() {
-        return carrosContador;
+    public int getGameCarSpeed() {
+        return gameCarSpeed;
     }
 
     public int getCarsPassedCount() {
@@ -71,5 +70,13 @@ public class GameData implements Serializable {
 
     public long getSlowEffectStartTime() {
         return slowEffectStartTime;
+    }
+
+    public boolean isInvencibleActive() {
+        return invencibleActive;
+    }
+
+    public long getInvencibleStartTime() {
+        return invencibleStartTime;
     }
 }

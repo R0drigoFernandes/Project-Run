@@ -4,6 +4,7 @@ import application.ProjectRun;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.io.Serializable;
+import java.awt.Font;
 
 public class InvencibilityItem implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -40,9 +41,15 @@ public class InvencibilityItem implements Serializable {
         }
     }
 
-    // Renderiza o item
+    // Renderiza o item de invencibilidade
     public void render(Graphics g) {
-        g.setColor(Color.YELLOW); // Cor do item de invencibilidade (exemplo)
-        g.fillRect(x, y, width, height);
+        g.setColor(Color.YELLOW); // Cor do item de invencibilidade
+        g.fillRect(x, y, width, height); // Desenha um quadrado
+        g.setFont(new Font("Negrito", Font.BOLD, 16));// Ajusta o tamanho da fonte
+        g.setColor(Color.WHITE); // Cor do texto
+        int textWidth = g.getFontMetrics().stringWidth("Invencibilidade!");
+        g.drawString("Invencibilidade!", x + (width / 2) - (textWidth / 2), y + height + 20);
+        
+        // Opcional: Desenhar um ícone de estrela
     }
 }
