@@ -57,9 +57,9 @@ public class ProjectRun extends Canvas implements Runnable, KeyListener {
     private long lastCarSpawnTime = 0;
     private final long CAR_SPAWN_DELAY = 1200; // Atraso em milissegundos entre os spawns de carros
     private long lastConsertarSpawnTime = 0;
-    private final long CONSERTAR_SPAWN_DELAY = 10000; // Atraso para item de consertar
+    private final long CONSERTAR_SPAWN_DELAY = 15000; // Atraso para item de consertar
     private long lastInvencibilitySpawnTime = 0;
-    private final long INVENCIBILITY_SPAWN_DELAY = 15000; // Atraso para item de invencibilidade
+    private final long INVENCIBILITY_SPAWN_DELAY = 30000; // Atraso para item de invencibilidade
     private long lastSlowItemSpawnTime = 0;
     private final long SLOW_ITEM_SPAWN_DELAY = 20000; // Atraso para item de lentidão
 
